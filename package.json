@@ -8,7 +8,8 @@
     "/dist"
   ],
   "scripts": {
-    "test": "ts-mocha -p tsconfig.json tests/**/*.ts"
+    "test": "ts-mocha -p tsconfig.json tests/**/*.ts",
+    "build": "tsc"
   },
   "devDependencies": {
     "@types/chai": "^4.3.5",

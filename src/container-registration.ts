@@ -1,5 +1,4 @@
-import {Constructor} from "./constructor";
-
+import {Constructor, ConstructorFuncName} from "./constructor";
 export class ContainerRegistration {
     typeToImplement: string;
     typeToUse: undefined | string;
@@ -17,9 +16,9 @@ export class ContainerRegistration {
         this.constructorFunc = objImplementation;
         this.typeToUse = (objImplementation as any).name;
         if (!this.typeToUse)
-            throw new Error("le type " + objImplementation + " n'est pas enregistré dans l'ioc !");
-        if (this.typeToUse.endsWith(".constructorFunc"))
-            this.typeToUse = this.typeToUse.replace(".constructorFunc", "");
+            throw new Error("Type " + objImplementation + " not found");
+        if (this.typeToUse.endsWith(ConstructorFuncName))
+            this.typeToUse = this.typeToUse.replace(ConstructorFuncName, "");
 
         return this;
     }
@@ -34,8 +33,8 @@ export class ContainerRegistration {
     withConstructor<T extends new (...args: any) => any>(this: ContainerRegistration, constType: Constructor<T> | string): ContainerRegistration {
         let typeName = (constType as any).name;
         if (typeName) {
-            if (typeName.endsWith(".constructorFunc"))
-                typeName = typeName.replace(".constructorFunc", "");
+            if (typeName.endsWith(ConstructorFuncName))
+                typeName = typeName.replace(ConstructorFuncName, "");
 
             this.constructorParamsToUse.push(typeName);
         }

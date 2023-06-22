@@ -1,5 +1,5 @@
-import {ContainerRegistration} from "./container-registration";
-import {Constructor}           from "./constructor";
+import {ContainerRegistration}            from "./container-registration";
+import {Constructor, ConstructorFuncName} from "./constructor";
 
 export class Container {
     private registrations: { [key: string]: ContainerRegistration } = {};
@@ -7,9 +7,9 @@ export class Container {
     private scopedInstances: { [scopeKey: number]: { [instanceKey: string]: any } } = {};
     private currentScope: number = 0;
 
-    constructor(patch?: boolean) {
-        if (patch !== false) {
-            //this.patch({ ncis });
+    constructor(patch?: any) { // { rootNamespace }
+        if (patch) {
+            this.patch(patch);
         }
     }
 
@@ -19,8 +19,8 @@ export class Container {
         let typeName = objToImplement as string;
         if ((objToImplement as Constructor<T>).name) {
             typeName = (objToImplement as Constructor<T>).name;
-            if (typeName.endsWith(".constructorFunc"))
-                typeName = typeName.replace(".constructorFunc", "");
+            if (typeName.endsWith(ConstructorFuncName))
+                typeName = typeName.replace(ConstructorFuncName, "");
         }
 
         let registration = new ContainerRegistration(typeName);
@@ -38,8 +38,8 @@ export class Container {
         let typeName = objToImplement as string;
         if ((objToImplement as Constructor<T>).name) {
             typeName = (objToImplement as Constructor<T>).name;
-            if (typeName.endsWith(".constructorFunc"))
-                typeName = typeName.replace(".constructorFunc", "");
+            if (typeName.endsWith(ConstructorFuncName))
+                typeName = typeName.replace(ConstructorFuncName, "");
         }
         let registration = this.registrations[typeName];
         if (!registration)
