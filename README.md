@@ -1,150 +1,149 @@
-# Injected-ts
+# Injected-ts: Simplifying Dependency Injection in TypeScript
 
-Injected-ts is a lightweight dependency injection library for TypeScript. It provides a container for managing and
-resolving dependencies within your application.
+Injected-ts is a lightweight dependency injection library for TypeScript that simplifies managing dependencies and enables efficient dependency injection in your applications. With Injected-ts, you can effortlessly handle dependency registration, resolution, and lifecycle management, resulting in cleaner and more modular code. This readme provides an overview of Injected-ts and demonstrates how to use it effectively in your projects.
 
-Why Injected-ts?
-Injected-ts aims to provide a simple yet powerful solution for managing dependencies in TypeScript applications. Here
-are some reasons why you should consider using Injected-ts in your projects:
+## Features
 
-Simplified Dependency Management: Injected-ts simplifies the process of registering and resolving dependencies within
-your application. It provides a container that acts as a central hub for managing dependencies.
+- **Dependency Registration**: Injected-ts allows you to register dependencies using a fluent and intuitive API.
+- **Flexible Lifecycle Management**: Choose from a variety of lifecycle options, including scoped, transient, and singleton.
+- **Constructor Parameter Injection**: Easily configure dependencies with constructor parameter injection.
+- **Interface Injection**: Register implementations for interfaces and resolve them by the interface identifier.
+- **Scopes and Lifecycles**: Create and manage scopes to control the lifetime of your dependencies.
+- **Type Safety and IntelliSense**: Benefit from TypeScript's static typing and receive accurate IntelliSense support.
 
-Flexible Dependency Resolution: Injected-ts supports constructor injection, interface injection, and factory injection.
-You can easily configure how dependencies are resolved and specify their lifecycles.
+## Installation
 
-Scopes and Lifecycles: Injected-ts allows you to define scoped instances and control the lifecycles of dependencies. You
-can create scoped instances for request-level dependencies or configure singletons for globally shared instances.
-
-Type Safety and IntelliSense: TypeScript's static typing ensures that dependencies are resolved with type safety.
-Injected-ts leverages TypeScript's features to provide accurate IntelliSense support during development.
-
-# Getting Started with Injected-ts
-
-To get started with Injected-ts, follow these steps:
-
-## 1- Installation:
-
-Install Injected-ts using npm or yarn by running the following command:
+You can install Injected-ts using npm or yarn:
 
 ```shell
 npm install injected-ts
 ```
 
-or
-
-```shell
-yarn add injected-ts
-```
-
-## 2- Creating a Container:
-
-Create an instance of the Container class to manage your dependencies. The container acts as a registry for dependency
-registration and resolution.
+## Usage
+Creating a Service Collection
+The ServiceCollection class is the starting point for configuring and registering your services. Create an instance of ServiceCollection to begin the process:
 
 ```typescript
-import {Container} from 'injected-ts';
+import { ServiceCollection } from 'injected-ts';
 
-const container = new Container();
+const services = new ServiceCollection();
 ```
 
-## 3- Registering Dependencies:
-
-Use the register method on the container to register your dependencies. You can register dependencies by providing a
-constructor function or a string representing the type name.
+## Registering Dependencies
+Use the various addScoped, addTransient, and addSingleton methods to register your dependencies. These methods allow you to specify the dependency type and the registration configuration:
 
 ```typescript
-container.register(FakeType).asSingleton();
-container.register('FakeInterface').use(FakeType).asSingleton();
-container.register(FakeTypeWithOneDependency).withConstructor(FakeType).asSingleton();
-container.register(FakeTypeWithTwoDependency).withConstructor(FakeType).withConstructor(FakeTypeWithOneDependency).asSingleton();
-// Register other dependencies
+services.addScoped<MyService>((builder) =>
+  builder.fromType(MyService).withDependencies(Dependency1, Dependency2)
+);
+
+services.addTransient<AnotherService>((builder) =>
+  builder.fromType(AnotherService)
+);
+
+services.addSingleton<SharedService>((builder) =>
+  builder.fromType(SharedService)
+);
 ```
 
-> >
-***Use the 'withConstructor' once by constructor argument to register dependencies with constructor injection. It should
-be called in same order as the constructor arguments.***
-
-## 4- Resolving Dependencies:
-
-Use the get method on the container to resolve your dependencies. The get method retrieves an instance of the registered
-type.
+## Resolving Dependencies
+To resolve a dependency, create an instance of ServiceProvider using the build method of ServiceCollection:
 
 ```typescript
-const fakeTypeInstance = container.get<FakeType>(FakeType.name);
-const fakeInterfaceInstance = container.get<FakeInterface>('FakeInterface');
-// Resolve other dependencies
+const serviceProvider = services.build();
+
+const myService = serviceProvider.get<MyService>(MyService.name);
+const anotherService = serviceProvider.get<AnotherService>(AnotherService.name);
+const sharedService = serviceProvider.get<SharedService>(SharedService.name);
 ```
 
-## 5- Scopes and Lifecycles:
-
-Utilize the container's scope and lifecycle options to control how dependencies are instantiated. You can create scopes,
-start and end them using startScope and endScope methods, and configure dependencies as singletons or transients.
+## Scopes and Lifecycles
+You can create scopes using the startScope method of ServiceProvider and manage the lifetime of dependencies within those scopes:
 
 ```typescript
-const scopeId = container.startScope();
+const scopeId = serviceProvider.startScope();
 // Resolve scoped dependencies within the scope
-container.endScope(scopeId);
 
-container.register(FakeType).transient();
-container.register(SomeSingletonDependency).asSingleton();
-container.register(SomeScopedDependency).scoped();
-// Configure other dependencies
+serviceProvider.endScope(scopeId);
 ```
 
-## 6- Advanced Usage:
-
-Injected-ts provides advanced features such as constructor parameter injection, interface injection, and factory
-injection. You can configure these options using the appropriate methods on the container's registration objects.
+## Constructor Parameter Injection
+Injected-ts supports constructor parameter injection. When registering a dependency, use the withDependencies method to specify the constructor dependencies:
 
 ```typescript
-container.register(FakeTypeWithTwoDependency).withConstructor(FakeType).withConstructor(FakeType).asSingleton();
-container.register(FakeTypeWithInterfaceDependency).withConstructor('FakeInterface').asSingleton();
-container.register('FakeInterface').useFactory(() => new FakeType()).asSingleton();
-// Configure other dependencies
+services.addScoped<MyService>((builder) =>
+  builder.fromType(MyService).withDependencies(Dependency1, Dependency2)
+);
 ```
-
-## 7- Building Modules with ContainerConfigurator
-
-To facilitate modular dependency configuration, Injected-ts provides the ContainerConfigurator class. It allows you to
-register services and dependencies into modules and load them onto the container.
+## Interface Injection
+You can register interface implementations and resolve them using the interface identifier:
 
 ```typescript
-import {Container, ContainerConfigurator} from 'injected-ts';
+services.addScoped<ILogger>((builder) =>
+  builder.fromName('ILogger').useType(ConsoleLogger).withDependencies()
+);
 
-// Register configurations
-ContainerConfigurator.register((container: Container) => {
-// Register services and dependencies for Module A
-    container.register(FakeType).asSingleton();
-    container.register(FakeTypeWithOneDependency).withConstructor(FakeType).asSingleton();
-// ...
-});
-
-ContainerConfigurator.register((container: Container) => {
-// Register services and dependencies for Module B
-    container.register('FakeInterface').use(FakeType).asSingleton();
-    container.register(FakeTypeWithInterfaceDependency).withConstructor('FakeInterface').asSingleton();
-// ...
-});
-
-// Build the container with the registered configurations
-const container = ContainerConfigurator.build(new Container());
+const logger = serviceProvider.get<ILogger>('ILogger');
 ```
 
-# License
+## Lifecycle Options
+Injected-ts provides the following lifecycle options for managing the lifetime of dependencies:
 
-Injected-ts is licensed under the MIT License.
+- **Scoped**: Dependencies are instantiated once per scope.
+- **Transient**: Dependencies are instantiated each time they are resolved.
+- **Singleton**: Dependencies are instantiated only once and reused for subsequent resolutions.
+You can specify the lifecycle using the addScoped, addTransient, and addSingleton methods:
 
-# Contributing
+```typescript
+services.addScoped<MyService>((builder) =>
+  builder.fromType(MyService).withDependencies(Dependency1, Dependency2)
+);
+```
 
-Contributions are welcome!
+## Custom Lifecycle Options
+Injected-ts provides the possibility to create our own lifecycle:
 
-# Acknowledgements
+Override the Lifecycle class and implement the lifecycle methods.
+Then add your service using the add() methods, and provide your own lifecycle.
 
-Injected-ts is inspired by various dependency injection frameworks and libraries.
+```typescript
+class CustomLifecycle implements Lifecycle {
+  // Implement the lifecycle methods
+}
 
-# Contact
+services.add<MyService>(new CustomLifecycle(), (builder) =>
+  builder.fromType(MyService).withDependencies(Dependency1, Dependency2)
+);
+```
 
-If you have any questions, issues, or suggestions, please feel free to open an issue or contact the maintainer.
+## Use the ServiceProvider inside a class or a factory
+Injected-ts provides the possibility to access the service provider instance by injecting it inside a class or a factory:
 
-Happy coding with Injected-ts!
+- Injection
+```typescript
+class MyService {
+  constructor(serviceProvider: ServiceProvider) {}
+
+  public doSomething() {
+    const anotherService = this.serviceProvider.get<AnotherService>(AnotherService.name);
+    // Do something with the service
+  }
+}
+```
+- Factory
+```typescript
+services.addSingleton<ServiceDependency>((builder) =>
+    builder.fromType(ServiceDependency.name).withDependencies(TypeDependency)
+);
+services.addSingleton<MyService>((builder) =>
+    builder.fromName('MyService').useFactory((serviceProvider) => new MyService("Some value", serviceProvider.get<ServiceDependency>(ServiceDependency.name)))
+);
+```
+
+## Conclusion
+Injected-ts simplifies dependency injection in TypeScript by providing a lightweight and intuitive solution for managing dependencies and controlling their lifecycles. By following the usage guidelines in this readme, you can leverage the power of dependency injection to build modular, maintainable, and scalable applications.
+
+For more details and advanced usage options, refer to the API Documentation.
+
+## License
+Injected-ts is licensed under the MIT License. See the LICENSE file for details.
