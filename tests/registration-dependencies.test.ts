@@ -1,74 +1,93 @@
-import {expect}    from "chai";
-import {Container} from "../src";
+import {expect}            from "chai";
 import {
     FakeInterface,
     FakeType,
     FakeTypeWithInterfaceDependency,
     FakeTypeWithOneDependency,
     FakeTypeWithTwoDependency
-}                  from "./data/fake-type";
+}                          from "./data/fake-type";
+import {ServiceCollection} from "../src";
 
 describe('Register types, then resolve them to get an instance', () => {
 
-    it('should work for non dependencies in constructor', () => {
-        let container = new Container();
-        container.register(FakeType).asSingleton();
+    it('should work for no dependencies in constructor', () => {
+        let serviceCollection = new ServiceCollection();
+        serviceCollection.addSingleton(r => r.fromType(FakeType));
+        serviceCollection.addSingleton(r => r.fromType(FakeTypeWithInterfaceDependency).withDependencies(FakeType));
+        let serviceProvider = serviceCollection.build();
 
-        let result = container.get<FakeType>(FakeType.name).doSomething();
+        let result = serviceProvider.get<FakeType>(FakeType.name).doSomething();
         expect(result).to.equal(new FakeType().doSomething());
     });
 
     it('should work for one dependencies in constructor', () => {
-        let container = new Container();
-        container.register(FakeType).asSingleton();
-        container.register(FakeTypeWithOneDependency).withConstructor(FakeType).asSingleton();
+        let serviceCollection = new ServiceCollection();
+        serviceCollection.addSingleton(r => r.fromType(FakeType));
+        serviceCollection.addSingleton(r => r.fromType(FakeTypeWithOneDependency).withDependencies(FakeType));
+        let serviceProvider = serviceCollection.build();
 
-        let result = container.get<FakeTypeWithOneDependency>(FakeTypeWithOneDependency.name).doSomething();
+        let result = serviceProvider.get<FakeTypeWithOneDependency>(FakeTypeWithOneDependency.name).doSomething();
         expect(result).to.equal(new FakeTypeWithOneDependency(new FakeType()).doSomething());
     });
 
 
     it('should work for two dependencies in constructor', () => {
-        let container = new Container();
-        container.register(FakeType).asSingleton();
-        container.register(FakeTypeWithOneDependency).withConstructor(FakeType).asSingleton();
-        container.register(FakeTypeWithTwoDependency).withConstructor(FakeType).withConstructor(FakeTypeWithOneDependency).asSingleton();
+        let serviceCollection = new ServiceCollection();
+        serviceCollection.addSingleton(r => r.fromType(FakeType));
+        serviceCollection.addSingleton(r => r.fromType(FakeTypeWithOneDependency).withDependencies(FakeType));
+        serviceCollection.addSingleton(r => r.fromType(FakeTypeWithTwoDependency).withDependencies(FakeType, FakeTypeWithOneDependency));
+        let serviceProvider = serviceCollection.build();
 
-        let result = container.get<FakeTypeWithTwoDependency>(FakeTypeWithTwoDependency.name).doSomething();
+        let result = serviceProvider.get<FakeTypeWithTwoDependency>(FakeTypeWithTwoDependency.name).doSomething();
         expect(result).to.equal(new FakeTypeWithTwoDependency(new FakeType(), new FakeTypeWithOneDependency(new FakeType())).doSomething());
     });
 
     it('should work using interface', () => {
-        let container = new Container();
-        container.register('FakeInterface').use(FakeType).asSingleton();
+        let serviceCollection = new ServiceCollection();
+        serviceCollection.addSingleton(r => r.fromName('FakeInterface').useType(FakeType));
+        let serviceProvider = serviceCollection.build();
 
-        let result = container.get<FakeInterface>('FakeInterface').doSomething();
+        let result = serviceProvider.get<FakeInterface>('FakeInterface').doSomething();
         expect(result).to.equal(new FakeType().doSomething());
     });
     it('should work using interface and many dependencies', () => {
-        let container = new Container();
-        container.register(FakeType).asSingleton();
-        container.register(FakeTypeWithOneDependency).withConstructor(FakeType).asSingleton();
-        container.register('FakeInterface').use(FakeTypeWithTwoDependency).withConstructor(FakeType).withConstructor(FakeTypeWithOneDependency).asSingleton();
+        let serviceCollection = new ServiceCollection();
+        serviceCollection.addSingleton(r => r.fromType(FakeType));
+        serviceCollection.addSingleton(r => r.fromType(FakeTypeWithOneDependency).withDependencies(FakeType));
+        serviceCollection.addSingleton(r => r.fromName('FakeInterface').useType(FakeTypeWithTwoDependency).withDependencies(FakeType, FakeTypeWithOneDependency));
+        let serviceProvider = serviceCollection.build();
 
-        let result = container.get<FakeInterface>('FakeInterface').doSomething();
+        let result = serviceProvider.get<FakeInterface>('FakeInterface').doSomething();
         expect(result).to.equal(new FakeTypeWithTwoDependency(new FakeType(), new FakeTypeWithOneDependency(new FakeType())).doSomething());
     });
 
     it('should work using interface injection', () => {
-        let container = new Container();
-        container.register('FakeInterface').use(FakeType).asSingleton();
-        container.register(FakeTypeWithInterfaceDependency).withConstructor('FakeInterface').asSingleton();
+        let serviceCollection = new ServiceCollection();
+        serviceCollection.addSingleton(r => r.fromName('FakeInterface').useType(FakeType));
+        serviceCollection.addSingleton(r => r.fromType(FakeTypeWithInterfaceDependency).withDependencies('FakeInterface'));
+        let serviceProvider = serviceCollection.build();
 
-        let result = container.get<FakeTypeWithInterfaceDependency>(FakeTypeWithInterfaceDependency.name).doSomething();
+        let result = serviceProvider.get<FakeTypeWithInterfaceDependency>(FakeTypeWithInterfaceDependency.name).doSomething();
         expect(result).to.equal(new FakeTypeWithInterfaceDependency(new FakeType()).doSomething());
     });
 
     it('should work with factory', () => {
-        let container = new Container();
-        container.register('FakeInterface').useFactory(() => new FakeType()).asSingleton();
+        let serviceCollection = new ServiceCollection();
+        serviceCollection.addSingleton(r => r.fromName('FakeInterface').useFactory(() => new FakeType()));
+        let serviceProvider = serviceCollection.build();
 
-        let result = container.get<FakeInterface>('FakeInterface').doSomething();
+        let result = serviceProvider.get<FakeInterface>('FakeInterface').doSomething();
+        expect(result).to.equal(new FakeType().doSomething());
+    });
+
+
+    it('should work with factory using service provider', () => {
+        let serviceCollection = new ServiceCollection();
+        serviceCollection.addSingleton(r => r.fromType(FakeType));
+        serviceCollection.addSingleton(r => r.fromName('FakeInterface').useFactory(s => s.get(FakeType)));
+        let serviceProvider = serviceCollection.build();
+
+        let result = serviceProvider.get<FakeInterface>('FakeInterface').doSomething();
         expect(result).to.equal(new FakeType().doSomething());
     });
 });
