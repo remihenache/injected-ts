@@ -1,9 +1,9 @@
-import {ComponentCompleted}          from "./ComponentCompleted";
-import {ComponentAlreadyImplemented} from "./ComponentAlreadyImplemented";
-import {Constructor, Factory}        from "../Constructor";
-import {ComponentWithConstructor}    from "./ComponentWithConstructor";
+import {ComponentCompleted}          from "./componentCompleted";
+import {ComponentAlreadyImplemented} from "./componentAlreadyImplemented";
+import {Constructor, Factory}     from "../constructor";
+import {ComponentWithConstructor} from "./componentWithConstructor";
 
-import {ComponentWithoutDependencies} from "./ComponentWithoutDependencies";
+import {ComponentWithoutDependencies} from "./componentWithoutDependencies";
 
 export class ComponentWithName {
     private readonly name: string;

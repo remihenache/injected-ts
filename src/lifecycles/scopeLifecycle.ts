@@ -1,4 +1,4 @@
-import {Lifecycle} from "./Lifecycle";
+import {Lifecycle} from "./lifecycle";
 
 export class ScopeLifecycle implements Lifecycle {
     private readonly _scopedInstances: Map<number, any> = new Map<number, any>();

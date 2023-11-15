@@ -1,5 +1,5 @@
 import {Lifecycle}       from "./lifecycles";
-import {ServiceProvider} from "./ServiceProvider";
+import {ServiceProvider} from "./serviceProvider";
 
 export class ComponentResolver {
     private readonly _name: string;

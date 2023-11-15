@@ -1,7 +1,7 @@
-import {Constructor}                  from "../Constructor";
-import {ComponentWithConstructor}     from "./ComponentWithConstructor";
-import {ComponentWithName}            from "./ComponentWithName";
-import {ComponentWithoutDependencies} from "./ComponentWithoutDependencies";
+import {Constructor}              from "../constructor";
+import {ComponentWithConstructor}     from "./componentWithConstructor";
+import {ComponentWithName}            from "./componentWithName";
+import {ComponentWithoutDependencies} from "./componentWithoutDependencies";
 
 export class RegistrationFactory {
 

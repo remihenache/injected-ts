@@ -1,5 +1,5 @@
-import {Constructor}        from "./Constructor";
-import {ComponentResolver}  from "./ComponentResolver";
+import {Constructor}        from "./constructor";
+import {ComponentResolver}  from "./componentResolver";
 import {SingletonLifecycle} from "./lifecycles";
 
 export class ServiceProvider {

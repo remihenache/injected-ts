@@ -1,6 +1,6 @@
-import {ServiceProvider}                                                   from "./ServiceProvider";
+import {ServiceProvider}                                                   from "./serviceProvider";
 import {Lifecycle, ScopeLifecycle, SingletonLifecycle, TransientLifecycle} from "./lifecycles";
-import {ComponentResolver}                                                 from "./ComponentResolver";
+import {ComponentResolver}                                                 from "./componentResolver";
 import {ComponentBuilder, ComponentCompleted, RegistrationFactory}         from "./registrations";
 
 export class ServiceCollection {

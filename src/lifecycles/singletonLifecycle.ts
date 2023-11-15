@@ -1,4 +1,4 @@
-import {Lifecycle} from "./Lifecycle";
+import {Lifecycle} from "./lifecycle";
 
 export class SingletonLifecycle implements Lifecycle {
     private _instance: any;

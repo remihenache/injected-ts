@@ -1,10 +1,10 @@
-import {Constructor}                  from "../Constructor";
-import {ComponentCompleted}           from "./ComponentCompleted";
-import {ComponentAlreadyImplemented}  from "./ComponentAlreadyImplemented";
-import {ComponentBuilder}             from "./ComponentBuilder";
-import {ComponentWithoutDependencies} from "./ComponentWithoutDependencies";
+import {Constructor}                 from "../constructor";
+import {ComponentCompleted}          from "./componentCompleted";
+import {ComponentAlreadyImplemented} from "./componentAlreadyImplemented";
+import {ComponentBuilder}             from "./componentBuilder";
+import {ComponentWithoutDependencies} from "./componentWithoutDependencies";
 import {Lifecycle}                    from "../lifecycles";
-import {ComponentResolver}            from "../ComponentResolver";
+import {ComponentResolver} from "../componentResolver";
 
 export class ComponentWithConstructor implements ComponentWithoutDependencies, ComponentBuilder {
     private readonly _typeName: string;

@@ -1,7 +1,7 @@
-import {ComponentCompleted} from "./ComponentCompleted";
-import {ComponentBuilder}   from "./ComponentBuilder";
+import {ComponentCompleted} from "./componentCompleted";
+import {ComponentBuilder}   from "./componentBuilder";
 import {Lifecycle}          from "../lifecycles";
-import {ComponentResolver}  from "../ComponentResolver";
+import {ComponentResolver} from "../componentResolver";
 
 export class ComponentAlreadyImplemented implements ComponentCompleted, ComponentBuilder {
     private readonly _typeName: string;

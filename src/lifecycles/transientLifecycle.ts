@@ -1,4 +1,4 @@
-import {Lifecycle} from "./Lifecycle";
+import {Lifecycle} from "./lifecycle";
 
 export class TransientLifecycle implements Lifecycle {
     private _provider: (...args: any) => any;

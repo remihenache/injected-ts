@@ -1,4 +1,4 @@
-import {ServiceCollection} from "./ServiceCollection";
+import {ServiceCollection} from "./serviceCollection";
 
 export class ModuleRegistration {
     private static _lstRegistration: ((serviceCollection: ServiceCollection) => void)[] = [];
